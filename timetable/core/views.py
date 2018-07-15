@@ -8,7 +8,7 @@ from .models import Subject
 
 
 def index(request):
-    return HttpResponse('index')
+    return render(request, 'core/index.html')
 
 
 def upload(request):
