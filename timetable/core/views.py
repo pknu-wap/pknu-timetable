@@ -1,10 +1,14 @@
-from django.http import HttpResponse
+import json
+
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import redirect, render
+from django.views.decorators.csrf import csrf_exempt
 
 import xlrd
 
 from .forms import UploadForm
 from .models import Subject
+from .serializers import SearchSerializer
 
 
 def index(request):
@@ -42,3 +46,19 @@ def upload(request):
     else:
         form = UploadForm()
     return render(request, 'core/upload.html', {'form': form})
+
+
+@csrf_exempt
+def search(request):
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body)
+        except json.JSONDecodeError as e:
+            return JsonResponse({'error': str(e)})
+
+        ser = SearchSerializer(data=body)
+        if ser.is_valid():
+            print(ser.validated_data)
+            return JsonResponse({'error': None})
+        else:
+            return JsonResponse({'error': ser.errors})
